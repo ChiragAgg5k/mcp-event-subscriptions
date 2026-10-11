@@ -9,13 +9,23 @@ description = "Experimental portable MCP webhook subscription records and JWE en
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"
+license-files = ["LICENSE"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+]
 dependencies = ["jsonschema>=4.23,<5", "jwcrypto>=1.5.6,<2"]
 
 [project.urls]
 Repository = "https://github.com/ChiragAgg5k/mcp-event-subscriptions"
+Documentation = "https://github.com/ChiragAgg5k/mcp-event-subscriptions#readme"
+Issues = "https://github.com/ChiragAgg5k/mcp-event-subscriptions/issues"
 
 [dependency-groups]
-dev = ["black>=24", "ruff>=0.11"]
+dev = ["black>=24", "ruff>=0.11", "twine>=6,<8"]
 
 [tool.hatch.build.targets.wheel]
 packages = ["packages/python/src/mcp_event_subscriptions"]

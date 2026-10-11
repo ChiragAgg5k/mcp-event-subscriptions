@@ -22,6 +22,16 @@ requests or notification payloads.
 - [Python reference implementation](packages/python/README.md).
 - [Upstream discussion draft](proposals/upstream-mcp.md).
 
+## Install the alpha release
+
+Once the first release is published to PyPI:
+
+```sh
+pip install mcp-event-subscriptions==0.1.0a1
+```
+
+See [RELEASING.md](RELEASING.md) for the Trusted Publishing setup and release process.
+
 ## Quick start
 
 Python 3.12 or newer and [uv](https://docs.astral.sh/uv/):
