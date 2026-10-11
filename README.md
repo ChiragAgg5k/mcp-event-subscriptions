@@ -24,7 +24,7 @@ requests or notification payloads.
 
 ## Install the alpha release
 
-Once the first release is published to PyPI:
+Available on [PyPI](https://pypi.org/project/mcp-event-subscriptions/0.1.0a1/) for Python 3.12 or newer:
 
 ```sh
 pip install mcp-event-subscriptions==0.1.0a1
