@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "id": "sub_example",
+  "principal": "principal_demo",
+  "event": {
+    "name": "functions.execution.failed",
+    "arguments": {
+      "project_id": "project_demo",
+      "function_id": "fn_demo"
+    }
+  },
+  "delivery": {
+    "mode": "webhook"
+  },
+  "lease": {
+    "expiresAt": "2030-01-01T01:00:00Z",
+    "refreshBefore": "2030-01-01T00:54:00Z"
+  },
+  "extensions": {}
+}

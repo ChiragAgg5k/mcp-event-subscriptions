@@ -1,9 +1,10 @@
 # Subscription Record v1 — experimental draft
 
-This document defines an optional persistence representation for webhook
-subscriptions. It is independent of the MCP wire protocol. MUST, SHOULD, and
-MAY express requirements for implementations claiming this draft profile; they
-are not additional requirements imposed on all MCP servers.
+This document defines an optional persistence representation for event
+subscriptions delivered by webhook or by push. It is independent of the MCP wire
+protocol. MUST, SHOULD, and MAY express requirements for implementations
+claiming this draft profile; they are not additional requirements imposed on all
+MCP servers.
 
 ## Record
 
@@ -19,12 +20,17 @@ JSON parsers MUST reject duplicate object keys and non-finite numbers.
 | `principal` | Nonempty, opaque canonical owner identifier. It MUST NOT contain bearer or refresh tokens. |
 | `event.name` | Event type advertised by the issuing server. |
 | `event.arguments` | JSON object; the adapter MUST validate it against that event's published input schema. |
-| `delivery.mode` | `webhook` in v1. |
-| `delivery.url` | Absolute HTTPS callback URL without user information or fragment. |
-| `delivery.secret` | `whsec_` followed by canonical padded standard base64 for 24–64 decoded bytes. |
+| `delivery.mode` | `webhook` or `push`. |
+| `delivery.url` | Webhook only: absolute HTTPS callback URL without user information or fragment. |
+| `delivery.secret` | Webhook only: `whsec_` followed by canonical padded standard base64 for 24–64 decoded bytes. |
 | `lease.expiresAt` | Actual expiry, or `null` for an explicitly granted no-expiry subscription. |
 | `lease.refreshBefore` | Suggested refresh deadline, or `null` together with `expiresAt`. |
 | `extensions` | Optional object with namespaced keys such as `io.appwrite.source`. |
+
+A `push` delivery MUST contain only `mode`. It records a subscription served on
+a stream the subscriber holds open (`events/stream`), so the record carries no
+callback or secret. Storing it lets an upstream that hands the record back with
+each event, such as a webhook, route that event to the stream.
 
 Timestamps MUST be UTC RFC 3339 strings using `Z`, with seconds and optionally
 1–6 fractional digits. A finite `refreshBefore` MUST be at or before `expiresAt`.
@@ -43,9 +49,11 @@ This draft has no compression profile.
 
 ## Identity and authorization
 
-The adapter MUST preserve MCP's logical identity based on principal, callback,
-event name, and arguments. This draft does not prescribe a hash algorithm or
-identifier syntax. Importing a record MUST NOT grant access: the receiving
+For webhook records, the adapter MUST preserve MCP's logical identity based on
+principal, callback, event name, and arguments. A push subscription is scoped to
+its stream: two streams with the same principal, event name and arguments are
+two subscriptions, so the adapter assigns each its own identifier. This draft
+does not prescribe a hash algorithm or identifier syntax. Importing a record MUST NOT grant access: the receiving
 server MUST establish tenant/resource ownership and current authorization.
 Principal identifiers are server-scoped; cross-server migration requires an
 explicit identity mapping and reauthorization, not merely copying JSON.

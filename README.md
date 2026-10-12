@@ -65,7 +65,8 @@ production keys.
 
 ## Scope
 
-Version 1 describes webhook subscription state and optional encrypted storage.
+Version 1 describes webhook and push subscription state and optional encrypted
+storage.
 It does not specify a SQL layout, implement a delivery queue, establish current
 caller authorization, or make refresh/delete operations atomic. Adapters must
 provide their own coordination and revocation checks. Encryption cannot detect
