@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "id": "sub_example",
+  "principal": "principal_demo",
+  "event": {
+    "name": "users.user.created",
+    "arguments": {
+      "project_id": "project_demo"
+    }
+  },
+  "delivery": {
+    "mode": "push",
+    "url": "https://receiver.example.com/events",
+    "secret": "whsec_AAECAwQFBgcICQoLDA0ODxAREhMUFRYXGBkaGxwdHh8="
+  },
+  "lease": {
+    "expiresAt": "2030-01-01T00:05:00Z",
+    "refreshBefore": "2030-01-01T00:03:00Z"
+  },
+  "extensions": {}
+}

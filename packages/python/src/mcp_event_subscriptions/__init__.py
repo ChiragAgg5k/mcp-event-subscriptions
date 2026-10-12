@@ -1,4 +1,4 @@
-"""Experimental webhook subscription records and a restricted JWE profile."""
+"""Experimental event subscription records and a restricted JWE profile."""
 
 from __future__ import annotations
 
@@ -27,6 +27,10 @@ SCHEMA = json.loads(
     files(__package__).joinpath("subscription-v1.schema.json").read_text()
 )
 VALIDATOR = Draft202012Validator(SCHEMA, format_checker=FormatChecker())
+WEBHOOK = "webhook"
+"""Delivery to a callback URL, signed with the record's secret."""
+PUSH = "push"
+"""Delivery on a stream the subscriber holds open; the record has no callback."""
 
 
 class RecordError(ValueError):
@@ -82,6 +86,26 @@ def _stamp(value: str) -> datetime:
     return datetime.fromisoformat(value.replace("Z", "+00:00"))
 
 
+def _webhook(delivery: dict[str, Any]) -> None:
+    """Semantic checks of a webhook delivery that the schema cannot express."""
+    url = urlsplit(delivery["url"])
+    # DNS, SSRF policy, and endpoint verification remain adapter responsibilities.
+    if (
+        url.scheme != "https"
+        or not url.hostname
+        or "@" in url.netloc
+        or "#" in delivery["url"]
+        or any(c.isspace() or ord(c) < 32 for c in delivery["url"])
+    ):
+        raise ValueError("invalid callback URL")
+    if url.port is not None and not 1 <= url.port <= 65535:
+        raise ValueError("invalid callback port")
+    secret = delivery["secret"][6:]
+    raw = base64.b64decode(secret, validate=True)
+    if not 24 <= len(raw) <= 64 or base64.b64encode(raw).decode() != secret:
+        raise ValueError("invalid secret")
+
+
 def validate_subscription(record: Any) -> dict[str, Any]:
     """Validate structure and semantics; return an independent JSON copy."""
     try:
@@ -89,22 +113,8 @@ def validate_subscription(record: Any) -> dict[str, Any]:
         encoded = _encode(record)
         if len(encoded) > MAX_BYTES or not VALIDATOR.is_valid(record):
             raise ValueError("invalid structure or size")
-        url = urlsplit(record["delivery"]["url"])
-        # DNS, SSRF policy, and endpoint verification remain adapter responsibilities.
-        if (
-            url.scheme != "https"
-            or not url.hostname
-            or "@" in url.netloc
-            or "#" in record["delivery"]["url"]
-            or any(c.isspace() or ord(c) < 32 for c in record["delivery"]["url"])
-        ):
-            raise ValueError("invalid callback URL")
-        if url.port is not None and not 1 <= url.port <= 65535:
-            raise ValueError("invalid callback port")
-        secret = record["delivery"]["secret"][6:]
-        raw = base64.b64decode(secret, validate=True)
-        if not 24 <= len(raw) <= 64 or base64.b64encode(raw).decode() != secret:
-            raise ValueError("invalid secret")
+        if record["delivery"]["mode"] == WEBHOOK:
+            _webhook(record["delivery"])
         expiry, refresh = (
             record["lease"]["expiresAt"],
             record["lease"]["refreshBefore"],
@@ -232,6 +242,8 @@ def open_envelope(
 
 
 __all__ = [
+    "PUSH",
+    "WEBHOOK",
     "EnvelopeError",
     "ExpiredSubscription",
     "RecordError",

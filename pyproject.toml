@@ -4,8 +4,8 @@ build-backend = "hatchling.build"
 
 [project]
 name = "mcp-event-subscriptions"
-version = "0.1.0a1"
-description = "Experimental portable MCP webhook subscription records and JWE envelopes"
+version = "0.1.0a2"
+description = "Experimental portable MCP event subscription records and JWE envelopes"
 readme = "README.md"
 requires-python = ">=3.12"
 license = "MIT"

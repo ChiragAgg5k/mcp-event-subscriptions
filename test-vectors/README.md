@@ -11,7 +11,8 @@ cryptography AES-GCM API to check JWE framing and authenticated data.
 
 `valid/` and `invalid/` contain record-validation cases. Structural cases are
 covered by JSON Schema; semantic cases (e.g. lease ordering) require the rules
-in SPEC.md. The packaged schema must equal the root schema. The `$id` is a
+in SPEC.md. `valid/push.json` is a push record, which carries no callback or
+secret. The packaged schema must equal the root schema. The `$id` is a
 schema identifier; no deployed GitHub Pages resolver is required.
 
 ## Secret-scanning classification
